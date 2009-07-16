@@ -1,15 +1,15 @@
 ZIP = zip
 
-XPT_FILE_SRC = xpcom/src/IDictionaryApp.xpt
-XPT_FILE_SRC_SRC = xpcom/src/IDictionaryApp.idl
-XPT_FILE = components/IDictionaryApp.xpt
-DYLIB_FILE = components/libIDictionaryApp.dylib
-DYLIB_FILE_SRC = xpcom/src/libIDictionaryApp.dylib
-DYLIB_FILE_SRC_SRC = xpcom/src/IDictionaryApp.idl xpcom/src/DictionaryApp.cpp xpcom/src/DictionaryApp.h xpcom/src/DictionaryAppModule.cpp
+XPT_FILE_SRC = xpcom/src/ISpeech.xpt
+XPT_FILE_SRC_SRC = xpcom/src/ISpeech.idl
+XPT_FILE = components/ISpeech.xpt
+DYLIB_FILE = components/libISpeech.dylib
+DYLIB_FILE_SRC = xpcom/src/libISpeech.dylib
+DYLIB_FILE_SRC_SRC = xpcom/src/ISpeech.idl xpcom/src/Speech.cpp xpcom/src/Speech.h xpcom/src/SpeechModule.cpp
 
-FILES = install.rdf chrome.manifest chrome/content/config.js chrome/content/config.xul chrome/content/dictionaryfox.js chrome/content/dictionaryfox.xul defaults/preferences/dictionaryfox.js
+FILES = install.rdf chrome.manifest chrome/content/speakingfox.js chrome/content/speakingfox.xul defaults/preferences/speakingfox.js
 
-TARGET = dictionaryfox.xpi
+TARGET = speakingfox.xpi
 
 $(TARGET): $(FILES) $(XPT_FILE) $(DYLIB_FILE)
 	$(ZIP) -r $(TARGET) chrome chrome.manifest components defaults install.rdf
