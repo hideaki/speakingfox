@@ -11,8 +11,8 @@ FILES = install.rdf chrome.manifest chrome/content/speakingfox.js chrome/content
 
 TARGET = speakingfox.xpi
 
-$(TARGET): $(FILES) $(XPT_FILE) $(DYLIB_FILE)
-	$(ZIP) -r $(TARGET) chrome chrome.manifest components defaults install.rdf
+$(TARGET): $(FILES)
+	$(ZIP) -r $(TARGET) $(FILES)
 
 $(XPT_FILE): $(XPT_FILE_SRC)
 	cp $(XPT_FILE_SRC) $(XPT_FILE)

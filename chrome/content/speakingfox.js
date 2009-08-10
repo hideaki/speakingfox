@@ -110,9 +110,20 @@ SpeakingFox.prototype = {
   speak: function() {
     try {
       netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+      var localFileComponent = Components.classes['@mozilla.org/file/local;1']
+        .createInstance(Components.interfaces.nsILocalFile);
+      localFileComponent.initWithPath("/usr/bin/say");
+      var processComponent = Components.classes['@mozilla.org/process/util;1']
+        .createInstance(Components.interfaces.nsIProcess);
+      processComponent.init(localFileComponent);
+      
+      var args = [this.selectionWord];
+      processComponent.run(false, args, args.length); //false means non-blocking
+/*
       var myComponent = Components.classes['@h5i.biz/XPCOM/ISpeech;1']
         .createInstance(Components.interfaces.ISpeech);
       var res = myComponent.Speak(this.selectionWord.replace(/\"/g, " "));
+*/
     } catch (err) {
       alert(err);
     }
