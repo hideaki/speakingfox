@@ -1,8 +1,0 @@
-#include "nsISupports.idl"
-
-[scriptable, uuid(71a8fc42-8e3c-412f-8db8-45ff573bef22)]
-interface ISpeech: nsISupports
-{
-  void Speak(in string a);
-};
-
