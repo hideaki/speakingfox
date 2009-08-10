@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <overlay id="speakingfox" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <popup id="contentAreaContextMenu">
-    <menuitem label='Start Speaking Text' oncommand='gSpeakingFox.onContextMenuSelect();'/>
+    <menuitem id="speakingfox-speak" label='Start Speaking Text' oncommand='gSpeakingFox.onStartContextMenuSelect();'/>
+    <menuitem id="speakingfox-stop" label='Stop Speaking' oncommand='gSpeakingFox.onStopContextMenuSelect();'/>
   </popup>
   <script src="speakingfox.js"/>
 </overlay>

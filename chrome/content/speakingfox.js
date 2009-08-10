@@ -41,6 +41,24 @@ function SpeakingFox() {
 
 SpeakingFox.prototype = {
   load: function() {
+    try {
+      var target = this;
+      document.getElementById("contentAreaContextMenu").addEventListener("popupshowing", function(e){target.adjustContextMenu()}, false);
+      this.speaking = false;
+      //init processComponent
+      netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+      this.localFileComponent = Components.classes['@mozilla.org/file/local;1']
+        .createInstance(Components.interfaces.nsILocalFile);
+      this.localFileComponent.initWithPath("/usr/bin/say");
+      this.isFF35 = (Components.interfaces.nsIProcess2 != null);
+      if(this.isFF35) {
+        this.processComponent = Components.classes['@mozilla.org/process/util;1']
+          .createInstance(Components.interfaces.nsIProcess2);
+        this.processComponent.init(this.localFileComponent);
+      }
+    } catch (err) {
+      alert(err);
+    }
   },
 
   updateCursorLoc: function(event) {
@@ -109,29 +127,53 @@ SpeakingFox.prototype = {
 
   speak: function() {
     try {
-      netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-      var localFileComponent = Components.classes['@mozilla.org/file/local;1']
-        .createInstance(Components.interfaces.nsILocalFile);
-      localFileComponent.initWithPath("/usr/bin/say");
-      var processComponent = Components.classes['@mozilla.org/process/util;1']
-        .createInstance(Components.interfaces.nsIProcess);
-      processComponent.init(localFileComponent);
-      
       var args = [this.selectionWord];
-      processComponent.run(false, args, args.length); //false means non-blocking
-/*
-      var myComponent = Components.classes['@h5i.biz/XPCOM/ISpeech;1']
-        .createInstance(Components.interfaces.ISpeech);
-      var res = myComponent.Speak(this.selectionWord.replace(/\"/g, " "));
-*/
+      if(this.isFF35){
+        this.processComponent.runAsync(args, args.length, this);
+        this.speaking = true;
+      }
+      else {
+        this.processComponent = Components.classes['@mozilla.org/process/util;1']
+          .createInstance(this.isFF35 ? Components.interfaces.nsIProcess2 : Components.interfaces.nsIProcess);
+        this.processComponent.init(this.localFileComponent);
+        this.processComponent.run(false, args, args.length); //false means non-blocking
+      }
     } catch (err) {
       alert(err);
     }
     return;
   },
 
-  onContextMenuSelect: function() {
+  observe: function(subject, topic, data){
+    this.speaking = false;
+  },
+
+  stop: function() {
+    try {
+      this.speaking = false;
+      this.processComponent.kill();
+    } catch (err) {
+      alert(err);
+    }
+    return;
+  },
+
+  onStartContextMenuSelect: function() {
     this.speak();
+  },
+
+  onStopContextMenuSelect: function() {
+    this.stop();
+  },
+
+  adjustContextMenu: function() {
+    if(this.isFF35){
+      document.getElementById("speakingfox-speak").hidden = this.speaking;
+      document.getElementById("speakingfox-stop").hidden = !(this.speaking);
+    }
+    else {
+      document.getElementById("speakingfox-stop").hidden = true;
+    }
   }
 };
 
