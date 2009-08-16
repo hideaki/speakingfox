@@ -13,7 +13,7 @@
         <em:maxVersion>3.5.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-    <em:targetPlatform>Darwin_x86-gcc3</em:targetPlatform>
+    <em:targetPlatform>Darwin</em:targetPlatform>
     <em:name>SpeakingFox</em:name>
     <em:description>Converts text to audible speech on Mac OS X.</em:description>
     <em:creator>Hideaki Hayashi</em:creator>

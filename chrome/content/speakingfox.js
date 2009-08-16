@@ -150,8 +150,10 @@ SpeakingFox.prototype = {
 
   stop: function() {
     try {
-      this.speaking = false;
-      this.processComponent.kill();
+      if(this.speaking) {
+        this.speaking = false;
+        this.processComponent.kill();
+      }
     } catch (err) {
       alert(err);
     }
