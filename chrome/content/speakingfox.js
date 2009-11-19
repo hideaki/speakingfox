@@ -50,12 +50,16 @@ SpeakingFox.prototype = {
       this.localFileComponent = Components.classes['@mozilla.org/file/local;1']
         .createInstance(Components.interfaces.nsILocalFile);
       this.localFileComponent.initWithPath("/usr/bin/say");
-      this.isFF35 = (Components.interfaces.nsIProcess2 != null);
-      if(this.isFF35) {
-        this.processComponent = Components.classes['@mozilla.org/process/util;1']
-          .createInstance(Components.interfaces.nsIProcess2);
-        this.processComponent.init(this.localFileComponent);
-      }
+      this.hasNsiProcess2 = (Components.interfaces.nsIProcess2 != null);
+      this.processComponent = Components.classes['@mozilla.org/process/util;1']
+        .createInstance(this.hasNsiProcess2 ? Components.interfaces.nsIProcess2 : Components.interfaces.nsIProcess);
+      this.processComponent.init(this.localFileComponent);
+      //version check
+      var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+        .getService(Components.interfaces.nsIXULAppInfo);
+      var versionChecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
+        .getService(Components.interfaces.nsIVersionComparator);
+      this.isFF30 = (versionChecker.compare(appInfo.version, "3.5") < 0);
     } catch (err) {
       alert(err);
     }
@@ -128,15 +132,15 @@ SpeakingFox.prototype = {
   speak: function() {
     try {
       var args = [this.selectionWord];
-      if(this.isFF35){
+      if(this.hasNsiProcess2){
         this.processComponent.runAsync(args, args.length, this);
         this.speaking = true;
       }
       else {
-        this.processComponent = Components.classes['@mozilla.org/process/util;1']
-          .createInstance(this.isFF35 ? Components.interfaces.nsIProcess2 : Components.interfaces.nsIProcess);
-        this.processComponent.init(this.localFileComponent);
-        this.processComponent.run(false, args, args.length); //false means non-blocking
+        try {
+          this.processComponent.run(false, args, args.length); //false means non-blocking
+        } catch (err) { // do nothing in case run is called more than once for same processComponent
+        }
       }
     } catch (err) {
       alert(err);
@@ -150,12 +154,9 @@ SpeakingFox.prototype = {
 
   stop: function() {
     try {
-      if(this.speaking) {
-        this.speaking = false;
-        this.processComponent.kill();
-      }
+      this.speaking = false;
+      this.processComponent.kill();
     } catch (err) {
-      alert(err);
     }
     return;
   },
@@ -169,12 +170,17 @@ SpeakingFox.prototype = {
   },
 
   adjustContextMenu: function() {
-    if(this.isFF35){
+    if(this.hasNsiProcess2){
       document.getElementById("speakingfox-speak").hidden = this.speaking;
       document.getElementById("speakingfox-stop").hidden = !(this.speaking);
     }
-    else {
+    else if(this.isFF30){
+      document.getElementById("speakingfox-speak").hidden = false;
       document.getElementById("speakingfox-stop").hidden = true;
+    }
+    else{
+      document.getElementById("speakingfox-speak").hidden = false;
+      document.getElementById("speakingfox-stop").hidden = false;
     }
   }
 };
