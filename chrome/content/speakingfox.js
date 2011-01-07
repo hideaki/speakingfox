@@ -60,6 +60,7 @@ SpeakingFox.prototype = {
       var versionChecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"]
         .getService(Components.interfaces.nsIVersionComparator);
       this.isFF30 = (versionChecker.compare(appInfo.version, "3.5") < 0);
+      this.hasNsiProcess2Feature = this.hasNsiProcess2 || (versionChecker.compare(appInfo.version, "3.6") >= 0);
     } catch (err) {
       alert(err);
     }
@@ -132,7 +133,7 @@ SpeakingFox.prototype = {
   speak: function() {
     try {
       var args = [this.selectionWord];
-      if(this.hasNsiProcess2){
+      if(this.hasNsiProcess2Feature){
         this.processComponent.runAsync(args, args.length, this);
         this.speaking = true;
       }
@@ -170,7 +171,7 @@ SpeakingFox.prototype = {
   },
 
   adjustContextMenu: function() {
-    if(this.hasNsiProcess2){
+    if(this.hasNsiProcess2Feature){
       document.getElementById("speakingfox-speak").hidden = this.speaking;
       document.getElementById("speakingfox-stop").hidden = !(this.speaking);
     }
